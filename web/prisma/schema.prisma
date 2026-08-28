@@ -1,0 +1,224 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Exchange {
+  BINANCE
+  BYBIT
+  OKX
+}
+
+enum ContestStatus {
+  UPCOMING
+  ACTIVE
+  ENDED
+}
+
+enum PrizePayoutStatus {
+  PLANNED
+  SENT
+}
+
+enum NotificationType {
+  ENTRY_OPENED
+  ENTRY_CLOSING_SOON
+  CONTEST_STARTED
+  CONTEST_ENDING_SOON
+}
+
+model User {
+  id            String   @id @default(cuid())
+  walletAddress String   @unique
+  displayName   String?
+  image         String?
+  createdAt     DateTime @default(now())
+
+  // Optional notification email, layered onto the same wallet-based account
+  // (not a separate login method). Only emailVerifiedAt != null is treated
+  // as a real, notifiable address.
+  email                      String?   @unique
+  emailVerifiedAt            DateTime?
+  emailVerificationToken     String?   @unique
+  emailVerificationExpiresAt DateTime?
+
+  exchangeConnections ExchangeConnection[]
+  balanceSnapshots    BalanceSnapshot[]
+  createdContests     Contest[]             @relation("ContestCreator")
+  participations      ContestParticipant[]
+  lockRecords         LockRecord[]
+  prizePayouts        PrizePayout[]
+  columns             Column[]
+  notifications       Notification[]
+}
+
+model ExchangeConnection {
+  id           String   @id @default(cuid())
+  userId       String
+  exchange     Exchange
+  label        String
+  apiKeyEnc    String
+  apiSecretEnc String
+  createdAt    DateTime @default(now())
+
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balanceSnapshots BalanceSnapshot[]
+
+  @@index([userId])
+}
+
+model BalanceSnapshot {
+  id                   String   @id @default(cuid())
+  exchangeConnectionId String
+  userId               String
+  equityUsd            Float
+  takenAt              DateTime @default(now())
+
+  exchangeConnection ExchangeConnection @relation(fields: [exchangeConnectionId], references: [id], onDelete: Cascade)
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, takenAt])
+  @@index([exchangeConnectionId, takenAt])
+}
+
+model Contest {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  // Entry period runs [entryOpensAt, startAt); the scoring period runs
+  // [startAt, endAt). Joining is only allowed during the entry period.
+  entryOpensAt DateTime
+  startAt      DateTime
+  endAt        DateTime
+  status       ContestStatus @default(UPCOMING)
+  createdById  String
+  createdAt    DateTime      @default(now())
+  // Free-text note describing the prize policy, e.g. "1位: 0.5 SOL(運営より進呈)".
+  // Prizes are paid out manually by the contest creator, wallet-to-wallet —
+  // never pooled from participants and never automated on-chain, so this
+  // stays a personal gift rather than a distribution from collected funds.
+  prizeNote String?
+  // Hours after `endAt` during which suspected cheating/wash-trading can be
+  // investigated before any prize is actually sent. Payouts can be recorded
+  // as PLANNED any time after the contest ends, but can't be marked SENT
+  // until endAt + reviewHours has passed.
+  reviewHours Int @default(24)
+  // When true, the cron job creates the next round automatically the moment
+  // this one ends, with that round's entryOpensAt set to this round's endAt
+  // — an unbroken, always-running cycle of entry period → contest period.
+  autoRenew Boolean @default(true)
+  roundNumber Int @default(1)
+
+  // Guards so the reminder cron sends each notification at most once per
+  // round. Null means "not sent yet".
+  entryOpenedNotifiedAt   DateTime?
+  entryClosingNotifiedAt  DateTime?
+  contestStartedNotifiedAt DateTime?
+  contestEndingNotifiedAt  DateTime?
+
+  // Self-referencing chain: each round points back to the round it continues.
+  previousContestId String?  @unique
+  previousContest    Contest? @relation("ContestChain", fields: [previousContestId], references: [id])
+  nextContest         Contest? @relation("ContestChain")
+
+  createdBy     User                  @relation("ContestCreator", fields: [createdById], references: [id])
+  participants  ContestParticipant[]
+  lockRecords   LockRecord[]
+  prizePayouts  PrizePayout[]
+  notifications Notification[]
+}
+
+model ContestParticipant {
+  id             String   @id @default(cuid())
+  contestId      String
+  userId         String
+  startEquityUsd Float
+  joinedAt       DateTime @default(now())
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([contestId, userId])
+}
+
+model LockRecord {
+  id             String    @id @default(cuid())
+  userId         String
+  contestId      String?
+  vaultPda       String
+  amountLamports BigInt
+  lockedAt       DateTime  @default(now())
+  unlockedAt     DateTime?
+  feeLamports    BigInt?
+  lockTxSig      String    @unique
+  unlockTxSig    String?
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest Contest? @relation(fields: [contestId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+// A prize the contest creator personally sends a winner, wallet-to-wallet,
+// from their own funds. Recorded here purely for display/transparency — the
+// app never holds or moves this money itself.
+model PrizePayout {
+  id          String            @id @default(cuid())
+  contestId   String
+  userId      String
+  rank        Int?
+  amountSol   Float
+  status      PrizePayoutStatus @default(PLANNED)
+  txSignature String?
+  note        String?
+  createdAt   DateTime          @default(now())
+  sentAt      DateTime?
+
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([contestId])
+}
+
+// A short, attributed quotation/snippet from an external article, plus
+// optional commentary — not a re-publication of the source. Keeps quotes
+// short and always links back to the original so this stays fair
+// quotation/aggregation rather than scraping or republishing someone else's
+// writing. Manually written columns require commentary; the daily automated
+// post (isAutomated = true) is a short headline + snippet with a link, in
+// the same spirit as a news-aggregator listing.
+model Column {
+  id          String   @id @default(cuid())
+  title       String
+  language    String
+  sourceName  String
+  sourceUrl   String
+  quote       String
+  commentary  String?
+  isAutomated Boolean  @default(false)
+  authorId    String
+  createdAt   DateTime @default(now())
+
+  author User @relation(fields: [authorId], references: [id])
+
+  @@index([createdAt])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  contestId String
+  type      NotificationType
+  message   String
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contest Contest @relation(fields: [contestId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+}
