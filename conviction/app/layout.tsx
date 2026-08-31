@@ -6,7 +6,7 @@ import { getCurrentUser } from "@/lib/session";
 import { t, LANG_COOKIE, type Lang } from "@/lib/i18n";
 
 export const metadata: Metadata = {
-  title: "Conviction",
+  title: "No Conviction, No Coin",
   description: "Pick one coin, pick one stance, and never see anything that contradicts it again.",
 };
 
@@ -19,9 +19,9 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang={lang}>
       <body className="antialiased">
         <header className="border-b border-zinc-200 dark:border-zinc-800">
-          <div className="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-1.5 font-semibold tracking-tight">
-              <span className="h-2.5 w-2.5 bg-zinc-900 dark:bg-white" aria-hidden="true" />
+          <div className="mx-auto flex max-w-4xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
+            <Link href="/" className="flex shrink-0 items-center gap-1.5 font-semibold tracking-tight">
+              <span className="h-2.5 w-2.5 shrink-0 bg-zinc-900 dark:bg-white" aria-hidden="true" />
               {t(lang, "siteName")}
             </Link>
             <nav className="flex items-center gap-4 text-sm text-zinc-600 dark:text-zinc-400">

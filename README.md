@@ -8,12 +8,12 @@
 coinlife/
   web/          # Next.jsアプリ本体 — セットアップは web/README.md 参照
   program/      # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
-  conviction/   # Conviction(CoinLifeとは独立した別アプリ) — conviction/README.md 参照
+  conviction/   # No Conviction, No Coin(CoinLifeとは独立した別アプリ、ディレクトリ名は開発コードネーム) — conviction/README.md 参照
 ```
 
-## conviction について
+## No Conviction, No Coin について
 
-`conviction/` は、CoinLifeとはアカウント・DBを共有しない独立したアプリです。登録時にコインを1つ、スタンス(強気/弱気どちらの報道を追いたいか)を1つだけ選び、以降は変更できません。ダッシュボードにはそのコイン・その方向性に一致する記事だけが表示されます — 他の意見に判断を揺さぶられないための、意図的な情報制限をコンセプトにしたアプリです。詳細は `conviction/README.md` を参照してください。
+`conviction/` は、CoinLifeとはアカウント・DBを共有しない独立したアプリです(サイト名は「No Conviction, No Coin」、ディレクトリ名は開発時のコードネームをそのまま使用)。登録時にコインを1つ、スタンス(強気/弱気どちらの報道を追いたいか)を1つだけ選び、以降は変更できません。ダッシュボードにはそのコイン・その方向性に一致する記事だけが表示されます — 他の意見に判断を揺さぶられないための、意図的な情報制限をコンセプトにしたアプリです。詳細は `conviction/README.md` を参照してください。
 
 ## 今すぐ動かす
 

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? request.nextUrl.origin;
     const verifyUrl = `${baseUrl}/api/auth/verify?token=${token}`;
-    await sendEmail(email, "Your Conviction login link", `Click to log in:\n\n${verifyUrl}\n\nThis link expires in 30 minutes.`);
+    await sendEmail(email, "Your No Conviction, No Coin login link", `Click to log in:\n\n${verifyUrl}\n\nThis link expires in 30 minutes.`);
   }
 
   return NextResponse.json({ ok: true });

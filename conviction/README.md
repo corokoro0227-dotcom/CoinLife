@@ -1,4 +1,6 @@
-# conviction
+# No Conviction, No Coin
+
+(codename in this repo: `conviction/`)
 
 A crypto news site built around one restriction: at signup you pick exactly one coin (Bitcoin or an established, non-meme altcoin) and exactly one stance (bullish-leaning or bearish/risk-leaning coverage). Neither can be changed afterward. From then on, your dashboard only shows real news matching that coin and that direction — nothing else, no site-authored analysis or predictions.
 

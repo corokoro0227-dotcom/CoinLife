@@ -10,7 +10,7 @@ export const LANG_COOKIE = "conviction_lang";
 
 const STRINGS = {
   en: {
-    siteName: "Conviction",
+    siteName: "No Conviction, No Coin",
     tagline: "One coin. One stance. No wavering.",
     navDashboard: "Dashboard",
     navAbout: "About",
@@ -18,7 +18,7 @@ const STRINGS = {
     navLogin: "Log in",
     navLangToggle: "日本語",
     footerDisclaimer:
-      "Conviction only aggregates existing public news. It does not analyze, predict, or recommend any trade. Nothing here is financial advice. Always make your own decisions.",
+      "No Conviction, No Coin only aggregates existing public news. It does not analyze, predict, or recommend any trade. Nothing here is financial advice. Always make your own decisions.",
     yourCommitment: "Your commitment",
     coinLabel: "Coin",
     stanceLabel: "Watching for",
@@ -33,7 +33,7 @@ const STRINGS = {
     emailNote: "New matching articles are emailed to you automatically. No need to check back.",
   },
   ja: {
-    siteName: "Conviction",
+    siteName: "No Conviction, No Coin",
     tagline: "コインは1つ、スタンスも1つ。もう迷わない。",
     navDashboard: "ダッシュボード",
     navAbout: "About",
@@ -41,7 +41,7 @@ const STRINGS = {
     navLogin: "ログイン",
     navLangToggle: "English",
     footerDisclaimer:
-      "Convictionは既存の公開ニュースを集約するだけです。分析・予想・売買推奨は一切行いません。掲載内容は投資助言ではありません。判断は必ずご自身で行ってください。",
+      "No Conviction, No Coinは既存の公開ニュースを集約するだけです。分析・予想・売買推奨は一切行いません。掲載内容は投資助言ではありません。判断は必ずご自身で行ってください。",
     yourCommitment: "あなたのコミットメント",
     coinLabel: "コイン",
     stanceLabel: "追いたい材料",

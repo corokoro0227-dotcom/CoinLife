@@ -6,7 +6,7 @@ import { translateToJapanese } from "@/lib/translate";
 
 const SECTIONS_EN = {
   intro:
-    "This page explains exactly how Conviction decides what you see, so the restriction feels like an honest tool rather than a black box.",
+    "This page explains exactly how No Conviction, No Coin decides what you see, so the restriction feels like an honest tool rather than a black box.",
   sourcesTitle: "News sources",
   sourcesBody:
     "Articles come only from the public RSS feeds listed below. We don't write, edit, or select individual stories — every item that mentions your coin is included automatically, filtered only by the rules below.",
@@ -23,7 +23,7 @@ const SECTIONS_EN = {
   bearishWordsTitle: "Bearish-leaning words",
   disclaimerTitle: "Disclaimer",
   disclaimerBody:
-    "Conviction does not provide financial advice and does not recommend buying, selling, or holding any asset. It aggregates existing public reporting only. The accuracy of any article is the responsibility of its original publisher, not Conviction. Make your own decisions and do your own research.",
+    "No Conviction, No Coin does not provide financial advice and does not recommend buying, selling, or holding any asset. It aggregates existing public reporting only. The accuracy of any article is the responsibility of its original publisher, not us. Make your own decisions and do your own research.",
 };
 
 export default async function AboutPage() {

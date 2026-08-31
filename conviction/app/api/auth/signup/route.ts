@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
   await sendEmail(
     email,
-    "Confirm your Conviction account",
+    "Confirm your No Conviction, No Coin account",
     `Click the link below to permanently lock in ${coin.name} (${coin.symbol}), ${
       stance === "BULLISH" ? "bullish signals" : "bearish / risk signals"
     }:\n\n${verifyUrl}\n\nThis link expires in 30 minutes. This choice cannot be changed once confirmed — that's the point.`,
