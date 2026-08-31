@@ -6,14 +6,14 @@
 
 ```
 coinlife/
-  web/         # Next.jsアプリ本体 — セットアップは web/README.md 参照
-  program/     # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
-  meme-board/  # ミームコイン情報ボード(CoinLifeとは独立した別アプリ) — meme-board/README.md 参照
+  web/          # Next.jsアプリ本体 — セットアップは web/README.md 参照
+  program/      # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
+  conviction/   # Conviction(CoinLifeとは独立した別アプリ) — conviction/README.md 参照
 ```
 
-## meme-board(ミームコイン情報ボード)について
+## conviction について
 
-`meme-board/` は、CoinLifeとはアカウント・DBを共有しない独立したアプリです。世界のミームコイン関連ニュースと市場データを複数の公開情報源からそのまま集約して並べるだけで、分析・予想・売買推奨は行いません。判断は閲覧者自身に委ねるコンセプトです。詳細は `meme-board/README.md` を参照してください。
+`conviction/` は、CoinLifeとはアカウント・DBを共有しない独立したアプリです。登録時にコインを1つ、スタンス(強気/弱気どちらの報道を追いたいか)を1つだけ選び、以降は変更できません。ダッシュボードにはそのコイン・その方向性に一致する記事だけが表示されます — 他の意見に判断を揺さぶられないための、意図的な情報制限をコンセプトにしたアプリです。詳細は `conviction/README.md` を参照してください。
 
 ## 今すぐ動かす
 

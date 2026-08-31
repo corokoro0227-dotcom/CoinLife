@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Stance {
+  BULLISH
+  BEARISH
+}
+
+// The whole point of this app: one coin, one stance, decided once at
+// signup and never editable again. A user who wants to change their mind
+// has to accept that the site won't help them do it quietly — that's the
+// commitment device. lastNotifiedAt tracks how far the email digest cron
+// has already caught this user up to.
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  coinId         String
+  coinSymbol     String
+  coinName       String
+  stance         Stance
+  createdAt      DateTime  @default(now())
+  lastNotifiedAt DateTime?
+
+  sessions    Session[]
+  loginTokens LoginToken[]
+}
+
+// A single-use, time-limited link sent by email. Also carries the pending
+// coin/stance/email for a brand-new signup that hasn't created a User yet —
+// the User row (and its permanent choice) is only written once this token
+// is actually consumed, so an abandoned signup never occupies an email.
+model LoginToken {
+  id         String    @id @default(cuid())
+  token      String    @unique
+  email      String
+  coinId     String?
+  coinSymbol String?
+  coinName   String?
+  stance     Stance?
+  expiresAt  DateTime
+  consumedAt DateTime?
+  userId     String?
+  createdAt  DateTime  @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([email])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
