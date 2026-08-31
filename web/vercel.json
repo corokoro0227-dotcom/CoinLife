@@ -7,10 +7,6 @@
     {
       "path": "/api/cron/daily-column",
       "schedule": "0 12 * * *"
-    },
-    {
-      "path": "/api/cron/daily-meme-coin",
-      "schedule": "30 12 * * *"
     }
   ]
 }

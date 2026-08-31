@@ -31,11 +31,6 @@ enum NotificationType {
   CONTEST_ENDING_SOON
 }
 
-enum ColumnCategory {
-  CRYPTO_NEWS
-  MEME_COIN
-}
-
 model User {
   id            String   @id @default(cuid())
   walletAddress String   @unique
@@ -197,25 +192,20 @@ model PrizePayout {
 // post (isAutomated = true) is a short headline + snippet with a link, in
 // the same spirit as a news-aggregator listing.
 model Column {
-  id          String         @id @default(cuid())
+  id          String   @id @default(cuid())
   title       String
   language    String
   sourceName  String
   sourceUrl   String
   quote       String
   commentary  String?
-  isAutomated Boolean        @default(false)
-  // CRYPTO_NEWS is the original news-digest column; MEME_COIN is the
-  // meme-coin trend bulletin board added later. Same underlying model/UI,
-  // filtered by category into two separate boards.
-  category    ColumnCategory @default(CRYPTO_NEWS)
+  isAutomated Boolean  @default(false)
   authorId    String
-  createdAt   DateTime       @default(now())
+  createdAt   DateTime @default(now())
 
   author User @relation(fields: [authorId], references: [id])
 
   @@index([createdAt])
-  @@index([category, createdAt])
 }
 
 model Notification {
