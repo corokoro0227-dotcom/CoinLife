@@ -12,23 +12,36 @@ Crypto information is noisy by design, and it's easy to have your own carefully-
 
 ## Stack
 
-- Next.js (App Router) + Prisma + SQLite (swap `DATABASE_URL` for Postgres in production)
+- Next.js (App Router) + Prisma + Postgres
 - Email-only auth (magic link via [Resend](https://resend.com)), no passwords — a lightweight session cookie, not NextAuth
 - News: public RSS feeds from established English-language crypto outlets (see `lib/feeds.ts`)
 - Market data: CoinGecko public API, no key required
 - Optional Japanese display: machine-translates the same English sources on the fly via DeepL (`DEEPL_API_KEY`) — no separate Japanese sources
-- Email digest: `/api/cron/notify`, intended to run every few hours via Vercel Cron (`vercel.json`)
+- Email digest: `/api/cron/notify`, runs once a day via Vercel Cron (`vercel.json`) — Vercel's free Hobby plan only allows daily cron schedules; a more frequent one requires the paid Pro plan
 
-## Setup
+## Local setup
 
 ```bash
 npm install
-cp .env.example .env
+cp .env.example .env   # fill in DATABASE_URL at minimum
 npx prisma migrate dev
 npm run dev
 ```
 
-Without `RESEND_API_KEY` set, magic-link emails are logged to the console instead of sent — enough to develop and test the full signup/login flow locally.
+Without a real Postgres, run one locally (`docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres postgres:16` or a native install) and point `DATABASE_URL` at it. Without `RESEND_API_KEY` set, magic-link emails are logged to the console instead of sent — enough to develop and test the full signup/login flow locally.
+
+## Deploying on free tiers only
+
+This app is designed to run at $0/month up to a few hundred users. What you need, all free:
+
+1. **Vercel** — import this repo, set the project root to `conviction/`. Hobby plan is fine.
+2. **Postgres** — [Neon](https://neon.tech) (or Supabase, or Vercel's own Postgres add-on) free tier. Copy the connection string into `DATABASE_URL` in the Vercel project's env vars.
+3. **Resend** — free tier (3,000 emails/month). Set `RESEND_API_KEY`. Important: until you verify your own sending domain (also free, just a few DNS records), the default `onboarding@resend.dev` sender can only deliver to the email address on your Resend account — real users won't receive mail until a domain is verified.
+4. **`CRON_SECRET`** — generate any random string (`node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`) and set it as an env var; Vercel Cron sends it automatically as a Bearer token.
+5. Run `npx prisma migrate deploy` against the production `DATABASE_URL` once (from your machine, or a Vercel deploy hook) before first use.
+6. `DEEPL_API_KEY` is optional — leave it unset to launch English-only; the Japanese toggle degrades gracefully to English without it.
+
+No paid plan is required until either the daily cron isn't frequent enough (Vercel Pro, $20/mo) or usage outgrows the free Postgres/Resend tiers.
 
 ## The commitment device, honestly
 
