@@ -38,8 +38,9 @@ This app is designed to run at $0/month up to a few hundred users. What you need
 2. **Postgres** — [Neon](https://neon.tech) (or Supabase, or Vercel's own Postgres add-on) free tier. Copy the connection string into `DATABASE_URL` in the Vercel project's env vars.
 3. **Resend** — free tier (3,000 emails/month). Set `RESEND_API_KEY`. Important: until you verify your own sending domain (also free, just a few DNS records), the default `onboarding@resend.dev` sender can only deliver to the email address on your Resend account — real users won't receive mail until a domain is verified.
 4. **`CRON_SECRET`** — generate any random string (`node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"`) and set it as an env var; Vercel Cron sends it automatically as a Bearer token.
-5. Run `npx prisma migrate deploy` against the production `DATABASE_URL` once (from your machine, or a Vercel deploy hook) before first use.
-6. `DEEPL_API_KEY` is optional — leave it unset to launch English-only; the Japanese toggle degrades gracefully to English without it.
+5. `DEEPL_API_KEY` is optional — leave it unset to launch English-only; the Japanese toggle degrades gracefully to English without it.
+
+Migrations apply themselves — `npm run build` runs `prisma migrate deploy` before `next build`, so every Vercel deploy brings the production schema up to date automatically. Nothing to run by hand.
 
 No paid plan is required until either the daily cron isn't frequent enough (Vercel Pro, $20/mo) or usage outgrows the free Postgres/Resend tiers.
 
