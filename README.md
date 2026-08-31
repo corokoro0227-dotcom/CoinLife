@@ -6,9 +6,14 @@
 
 ```
 coinlife/
-  web/       # Next.jsアプリ本体 — セットアップは web/README.md 参照
-  program/   # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
+  web/         # Next.jsアプリ本体 — セットアップは web/README.md 参照
+  program/     # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
+  meme-board/  # ミームコイン情報ボード(CoinLifeとは独立した別アプリ) — meme-board/README.md 参照
 ```
+
+## meme-board(ミームコイン情報ボード)について
+
+`meme-board/` は、CoinLifeとはアカウント・DBを共有しない独立したアプリです。世界のミームコイン関連ニュースと市場データを複数の公開情報源からそのまま集約して並べるだけで、分析・予想・売買推奨は行いません。判断は閲覧者自身に委ねるコンセプトです。詳細は `meme-board/README.md` を参照してください。
 
 ## 今すぐ動かす
 
