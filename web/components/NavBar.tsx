@@ -18,6 +18,9 @@ export function NavBar() {
             <Link href="/columns" className="hover:text-zinc-900 dark:hover:text-zinc-100">
               コラム
             </Link>
+            <Link href="/meme-coins" className="hover:text-zinc-900 dark:hover:text-zinc-100">
+              ミームコイン
+            </Link>
             <Link href="/exchanges" className="hover:text-zinc-900 dark:hover:text-zinc-100">
               取引所連携
             </Link>

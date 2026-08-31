@@ -17,6 +17,10 @@ export default async function ColumnPage({ params }: { params: Promise<{ id: str
   const userId = (session?.user as { id?: string } | undefined)?.id;
   const isAuthor = userId === column.authorId;
 
+  const isMemeCoin = column.category === "MEME_COIN";
+  const listHref = isMemeCoin ? "/meme-coins" : "/columns";
+  const listLabel = isMemeCoin ? "ミームコイン掲示板に戻る" : "コラム一覧に戻る";
+
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 pb-16">
       <div>
@@ -48,8 +52,8 @@ export default async function ColumnPage({ params }: { params: Promise<{ id: str
       )}
 
       <div className="flex items-center justify-between border-t border-zinc-200 pt-4 dark:border-zinc-800">
-        <Link href="/columns" className="text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300">
-          コラム一覧に戻る
+        <Link href={listHref} className="text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-300">
+          {listLabel}
         </Link>
         {isAuthor && <DeleteColumnButton columnId={column.id} />}
       </div>
