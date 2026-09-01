@@ -90,6 +90,64 @@ df.to_csv("btcusdt_5m.csv", index=False)
 
 `python backtest.py --help` で全オプションを確認できる。
 
+## ライブbot(Binance USDT-M無期限先物・全銘柄スクリーニング)
+
+`live_bot.py` は、Binanceの流動性のあるUSDT-M無期限先物を出来高でスクリーニングし、
+銘柄を限定せずに同じシグナルロジック(`strategy.py`)を適用して自動でショート/決済まで行う。
+バックテストと寸分違わぬロジックにするため、シグナル計算は`strategy.py`に一本化して両者から参照している。
+
+### 重要な注意事項(必ず読むこと)
+
+- **既定はdry-run(発注シミュレーション)**。実際に注文を送るには `--live` に加えて環境変数
+  `I_UNDERSTAND_THE_RISK=1` を明示的に設定する必要がある(事故防止の二重ロック)。
+- **このリポジトリのセッション(サンドボックス)からは外部ネットワークがブロックされており、
+  Binance APIへの実際の疎通確認ができていない**。ロジック部分(シグナル判定・状態遷移)は
+  合成データによるオフラインテストで検証済みだが、注文まわりのコード(注文タイプ・精度丸め等)は
+  必ず自分の環境で**まずBinance Futures Testnet(`--testnet`)、次に本番APIでのdry-run**の順に
+  動作確認してから`--live`を使うこと。
+- **APIキーはAPI取引権限のみ付与し、出金権限は絶対に付けない**。キーは環境変数
+  `BINANCE_API_KEY` / `BINANCE_API_SECRET` で渡し、コードやリポジトリに書かない
+  (`.env`は`.gitignore`済み)。
+- **日本居住者はBinance利用の可否・税務・現地法令を自分で確認すること**。Binanceの国際プラットフォーム
+  (binance.com)は過去に日本の金融庁から警告を受けており、日本向けには別法人(Binance Japan)が
+  限定的な商品ラインナップで運営している。国際版口座で無期限先物を使えるかどうかは自己責任で確認が必要。
+- 日次最大損失(`--max-daily-loss-pct`、既定3%)に達すると新規エントリーを止めるキルスイッチを実装しているが、
+  **これは損失を保証しない**。想定外の相場急変・API障害・取引所メンテナンス等のリスクは残る。
+- ポジション状態はプロセス内メモリのみで保持しており、**bot再起動でポジション追跡がリセットされる**
+  (実際の建玉は取引所側に残るため、再起動時は必ず取引所の管理画面で建玉を確認すること)。
+
+### 使い方
+
+```bash
+export BINANCE_API_KEY=xxxx
+export BINANCE_API_SECRET=xxxx
+
+# 1. まずTestnetでdry-run
+python live_bot.py --testnet
+
+# 2. 本番APIでdry-run(実弾は送らず、監視対象・シグナル発生をログで確認)
+python live_bot.py
+
+# 3. 動作に納得できたら少額・低レバレッジで実弾(必ず自己責任で)
+I_UNDERSTAND_THE_RISK=1 python live_bot.py --live --leverage 2 --max-positions 1 --risk-per-trade-pct 0.5
+```
+
+主なCLIオプション(戦略パラメータは`backtest.py`と共通):
+
+| 引数 | 意味 | デフォルト |
+|---|---|---|
+| `--testnet` | Binance Futures Testnetを使用 | 無効 |
+| `--live` | 実弾発注を有効化 | 無効(dry-run) |
+| `--min-quote-volume-usdt` | スクリーニング対象の最低24h出来高(USDT) | 5,000,000 |
+| `--max-symbols` | 監視する銘柄数の上限 | 30 |
+| `--max-positions` | 同時保有ポジション数の上限 | 3 |
+| `--max-daily-loss-pct` | 日次最大損失(%、到達で新規停止) | 3.0 |
+| `--timeframe` | ローソク足の時間軸 | 5m |
+| `--poll-interval-sec` | ポーリング間隔(秒) | 60 |
+| `--leverage` | 実弾時のレバレッジ | 2 |
+
+`python live_bot.py --help` で全オプションを確認できる。
+
 ## 次にやること(推奨)
 
 - 実データ(できれば複数銘柄・複数期間)でパラメータ感度を確認し、過学習を避ける
