@@ -1,0 +1,20 @@
+{
+  "name": "memecoin-scout",
+  "version": "0.1.0",
+  "private": true,
+  "description": "X上で早期に伸びているミームコインの兆候をスキャンし、通知するだけの半自動ツール(自動売買はしない)",
+  "type": "module",
+  "scripts": {
+    "scan": "tsx src/cli.ts scan",
+    "watch": "tsx src/cli.ts watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "@types/node": "^20.14.0"
+  }
+}
