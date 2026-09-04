@@ -1,0 +1,22 @@
+{
+  "name": "coinlife-rsi-volume-bot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BTC無期限先物(複数取引所)を監視し、RSI(14)が30未満かつ出来高が過去平均比+200%以上になった取引所をDiscord/Telegramへ通知するbot",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "start:dist": "node dist/index.js"
+  },
+  "dependencies": {
+    "ccxt": "^4.5.76",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "tsx": "^4.19.2",
+    "typescript": "^5"
+  }
+}
