@@ -1,0 +1,26 @@
+[
+  {
+    "name": "TraderA",
+    "trackRecordDays": 420,
+    "roi7dPct": 8.5,
+    "winRate7dPct": 62,
+    "tradesPerWeek": 15,
+    "maxDrawdownPct": 18,
+    "profitShareRatio": 10,
+    "followerCount": 3400,
+    "aumUsdt": 210000,
+    "typicalLeverage": 10
+  },
+  {
+    "name": "TraderB",
+    "trackRecordDays": 25,
+    "roi7dPct": 65,
+    "winRate7dPct": 100,
+    "tradesPerWeek": 4,
+    "maxDrawdownPct": null,
+    "profitShareRatio": 20,
+    "followerCount": 12000,
+    "aumUsdt": 900000,
+    "typicalLeverage": 50
+  }
+]
