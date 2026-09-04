@@ -8,6 +8,7 @@
 coinlife/
   web/       # Next.jsアプリ本体 — セットアップは web/README.md 参照
   program/   # Solana Anchorプログラム(lock_vault) — セットアップは program/README.md 参照
+  bots/      # 常駐監視bot群(CoinLife本体とは独立) — 各botのREADME参照
 ```
 
 ## 今すぐ動かす
