@@ -15,14 +15,23 @@ function envNumber(name: string, fallback: number): number {
   return n;
 }
 
+function envBoolean(name: string, fallback: boolean): boolean {
+  const v = process.env[name];
+  if (!v) return fallback;
+  return ["1", "true", "yes", "on"].includes(v.trim().toLowerCase());
+}
+
 export interface Config {
-  exchanges: string[];
+  exchange: string;
   symbol: string;
   timeframe: string;
   rsiPeriod: number;
   rsiThreshold: number;
   volumeLookback: number;
   volumeSpikeMultiplier: number;
+  requireBullishCloseCandle: boolean;
+  trendTimeframe: string;
+  trendEmaPeriod: number;
   pollIntervalSec: number;
   alertCooldownSec: number;
   discordWebhookUrl: string | undefined;
@@ -31,23 +40,17 @@ export interface Config {
 }
 
 export function loadConfig(): Config {
-  const exchanges = envString("EXCHANGES", "binance,bybit,okx")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean);
-
-  if (exchanges.length === 0) {
-    throw new Error("EXCHANGES に最低1つは取引所IDを指定してください");
-  }
-
   return {
-    exchanges,
+    exchange: envString("EXCHANGE", "binance").toLowerCase(),
     symbol: envString("SYMBOL", "BTC/USDT:USDT"),
     timeframe: envString("TIMEFRAME", "15m"),
     rsiPeriod: envNumber("RSI_PERIOD", 14),
     rsiThreshold: envNumber("RSI_THRESHOLD", 30),
     volumeLookback: envNumber("VOLUME_LOOKBACK", 20),
     volumeSpikeMultiplier: envNumber("VOLUME_SPIKE_MULTIPLIER", 3.0),
+    requireBullishCloseCandle: envBoolean("REQUIRE_BULLISH_CLOSE", true),
+    trendTimeframe: envString("TREND_TIMEFRAME", "4h"),
+    trendEmaPeriod: envNumber("TREND_EMA_PERIOD", 200),
     pollIntervalSec: envNumber("POLL_INTERVAL_SEC", 60),
     alertCooldownSec: envNumber("ALERT_COOLDOWN_SEC", 3600),
     discordWebhookUrl: process.env.DISCORD_WEBHOOK_URL || undefined,

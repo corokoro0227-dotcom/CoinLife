@@ -1,7 +1,6 @@
-import type { Exchange } from "ccxt";
 import { loadConfig } from "./config.js";
 import { createExchange, evaluateExchange } from "./scanner.js";
-import { sendAlert, type AlertPayload } from "./notify.js";
+import { sendAlert } from "./notify.js";
 
 async function main() {
   const config = loadConfig();
@@ -13,41 +12,32 @@ async function main() {
   }
 
   console.log(
-    `[init] 監視開始: symbol=${config.symbol} timeframe=${config.timeframe} ` +
-      `exchanges=${config.exchanges.join(",")} rsi<${config.rsiThreshold} ` +
-      `volume>=${config.volumeSpikeMultiplier}x poll=${config.pollIntervalSec}s`,
+    `[init] 監視開始: exchange=${config.exchange} symbol=${config.symbol} ` +
+      `timeframe=${config.timeframe} rsi<${config.rsiThreshold} ` +
+      `volume>=${config.volumeSpikeMultiplier}x trend=EMA${config.trendEmaPeriod}(${config.trendTimeframe}) ` +
+      `bullishClose=${config.requireBullishCloseCandle} poll=${config.pollIntervalSec}s`,
   );
 
-  const exchanges = new Map<string, Exchange>();
-  for (const id of config.exchanges) {
-    try {
-      exchanges.set(id, createExchange(id));
-    } catch (err) {
-      console.error(`[init] 取引所 ${id} の初期化に失敗しました:`, err);
-    }
-  }
+  const exchange = createExchange(config.exchange);
 
-  const lastAlertAt = new Map<string, number>();
+  let lastAlertAt = 0;
   let stopped = false;
 
   const tick = async () => {
-    for (const [id, exchange] of exchanges) {
-      try {
-        const alert: AlertPayload | null = await evaluateExchange(exchange, id, config);
-        if (!alert) continue;
+    try {
+      const alert = await evaluateExchange(exchange, config.exchange, config);
+      if (!alert) return;
 
-        const now = Date.now();
-        const last = lastAlertAt.get(id) ?? 0;
-        if (now - last < config.alertCooldownSec * 1000) {
-          console.log(`[cooldown] ${id} は条件成立中ですがクールダウン中のため通知をスキップ`);
-          continue;
-        }
-
-        lastAlertAt.set(id, now);
-        await sendAlert(config, alert);
-      } catch (err) {
-        console.error(`[scan] ${id} の評価中にエラー:`, err);
+      const now = Date.now();
+      if (now - lastAlertAt < config.alertCooldownSec * 1000) {
+        console.log(`[cooldown] 条件成立中ですがクールダウン中のため通知をスキップ`);
+        return;
       }
+
+      lastAlertAt = now;
+      await sendAlert(config, alert);
+    } catch (err) {
+      console.error(`[scan] ${config.exchange} の評価中にエラー:`, err);
     }
   };
 
@@ -61,7 +51,7 @@ async function main() {
     stopped = true;
     clearInterval(interval);
     console.log("[shutdown] 停止中...");
-    await Promise.allSettled(Array.from(exchanges.values()).map((ex) => ex.close?.()));
+    await exchange.close?.();
     process.exit(0);
   };
 

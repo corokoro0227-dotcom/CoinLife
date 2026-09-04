@@ -7,18 +7,24 @@ export interface AlertPayload {
   price: number;
   rsi: number;
   volumeMultiplier: number;
+  bullishCloseCandle: boolean;
+  trendTimeframe: string;
+  trendEma: number;
+  aboveTrend: boolean;
   candleTime: Date;
 }
 
 function formatMessage(a: AlertPayload): string {
   const pct = ((a.volumeMultiplier - 1) * 100).toFixed(0);
   return (
-    `🔔 BTC先物シグナル検出\n` +
+    `🔔 BTC先物 押し目買いシグナル\n` +
     `取引所: ${a.exchangeId}\n` +
     `シンボル: ${a.symbol} (${a.timeframe})\n` +
     `価格: ${a.price}\n` +
     `RSI(${a.timeframe}): ${a.rsi.toFixed(2)} (< 閾値)\n` +
     `出来高: 過去平均比 +${pct}%\n` +
+    `陽線確認: ${a.bullishCloseCandle ? "○" : "×"}\n` +
+    `トレンドフィルタ: 価格 ${a.aboveTrend ? ">" : "<"} EMA${a.trendTimeframe} (${a.trendEma.toFixed(1)}) ${a.aboveTrend ? "○" : "×"}\n` +
     `足の時刻: ${a.candleTime.toISOString()}`
   );
 }

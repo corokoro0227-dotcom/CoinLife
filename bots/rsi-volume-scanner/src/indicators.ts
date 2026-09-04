@@ -54,3 +54,25 @@ export function volumeSpikeMultiplier(
   const multiplier = averageVolume === 0 ? Infinity : latestVolume / averageVolume;
   return { latestVolume, averageVolume, multiplier };
 }
+
+/**
+ * EMA(指数移動平均)。closes は古い順の終値配列。
+ * 先頭 period 本の単純移動平均をシード値として、そこから指数平滑する。
+ * 戻り値は最後の終値時点でのEMA。
+ */
+export function calculateEMA(closes: number[], period: number): number {
+  if (closes.length < period) {
+    throw new Error(
+      `EMA計算には最低 ${period} 本の終値が必要ですが ${closes.length} 本しかありません`,
+    );
+  }
+
+  const k = 2 / (period + 1);
+  let ema = closes.slice(0, period).reduce((sum, v) => sum + v, 0) / period;
+
+  for (let i = period; i < closes.length; i++) {
+    ema = closes[i] * k + ema * (1 - k);
+  }
+
+  return ema;
+}
