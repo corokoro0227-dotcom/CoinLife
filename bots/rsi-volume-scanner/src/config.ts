@@ -41,7 +41,7 @@ export interface Config {
 
 export function loadConfig(): Config {
   return {
-    exchange: envString("EXCHANGE", "binance").toLowerCase(),
+    exchange: envString("EXCHANGE", "mexc").toLowerCase(),
     symbol: envString("SYMBOL", "BTC/USDT:USDT"),
     timeframe: envString("TIMEFRAME", "15m"),
     rsiPeriod: envNumber("RSI_PERIOD", 14),
