@@ -12,11 +12,13 @@ export interface AlertPayload {
   trendEma: number;
   aboveTrend: boolean;
   candleTime: Date;
+  isTest?: boolean;
 }
 
 function formatMessage(a: AlertPayload): string {
   const pct = ((a.volumeMultiplier - 1) * 100).toFixed(0);
   return (
+    `${a.isTest ? "🧪 [テスト通知・ダミーデータです。実際のシグナルではありません]\n" : ""}` +
     `🔔 BTC先物 押し目買いシグナル\n` +
     `取引所: ${a.exchangeId}\n` +
     `シンボル: ${a.symbol} (${a.timeframe})\n` +
